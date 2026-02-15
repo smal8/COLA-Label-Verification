@@ -3,91 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Label Verification</title>
+    <title>Label Verification — TTB Compliance Prototype</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Alcohol Label Verification</h1>
-        <p class="subtitle">Upload label images and enter the declared label information to verify compliance.</p>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <h1 class="page-header__title">Label Verification</h1>
+            <span class="page-header__badge">TTB Compliance Prototype</span>
+        </div>
+    </header>
 
-        <form action="/submit" method="post" enctype="multipart/form-data">
-            <!-- Beverage type determines which validation rules apply -->
-            <div class="form-group">
-                <label for="beverage_type">Beverage Type</label>
-                <select id="beverage_type" name="beverage_type" required>
-                    <option value="" disabled selected>Select beverage type</option>
-                    <option value="malt">Beer / Malt Beverage</option>
-                    <option value="spirits">Distilled Spirits</option>
-                    <option value="wine">Wine</option>
-                </select>
-            </div>
+    <main class="container">
+        <div class="form-intro">
+            <h2>Verify a Label</h2>
+            <p>Enter the declared label information and upload label images to check compliance against TTB requirements.</p>
+        </div>
 
-            <hr>
-
-            <!-- Brand name: validated via case-insensitive contains check against OCR text -->
-            <div class="form-group">
-                <label for="brand_name">Brand Name</label>
-                <input type="text" id="brand_name" name="brand_name" placeholder="e.g., Jack Daniel's" required>
-            </div>
-
-            <!-- Class/type designation: e.g., "Tennessee Whiskey", "Cabernet Sauvignon" -->
-            <div class="form-group">
-                <label for="class_type_designation">Class/Type Designation</label>
-                <input type="text" id="class_type_designation" name="class_type_designation"
-                       placeholder="e.g., Tennessee Whiskey" required>
-            </div>
-
-            <div class="form-row">
-                <!-- Alcohol content: validated via regex extraction + exact numeric match -->
+        <form action="/submit" method="post" enctype="multipart/form-data" id="verify-form">
+            <fieldset class="form-section">
+                <legend class="form-section__legend">Beverage Type</legend>
                 <div class="form-group">
-                    <label for="alcohol_content">Alcohol Content</label>
-                    <p class="hint">As shown on label.</p>
-                    <input type="text" id="alcohol_content" name="alcohol_content"
-                           placeholder="e.g., 40%" required>
+                    <label for="beverage_type">Select the beverage category</label>
+                    <select id="beverage_type" name="beverage_type" required>
+                        <option value="" disabled selected>Choose beverage type...</option>
+                        <option value="malt">Beer / Malt Beverage</option>
+                        <option value="spirits">Distilled Spirits</option>
+                        <option value="wine">Wine</option>
+                    </select>
                 </div>
+            </fieldset>
 
-                <!-- Net contents: validated via regex presence check on OCR text -->
+            <fieldset class="form-section">
+                <legend class="form-section__legend">Label Information</legend>
+
                 <div class="form-group">
-                    <label for="net_contents">Net Contents</label>
-                    <p class="hint">Volume as shown on label.</p>
-                    <input type="text" id="net_contents" name="net_contents"
-                           placeholder="e.g., 750 mL" required>
+                    <label for="brand_name">Brand Name</label>
+                    <input type="text" id="brand_name" name="brand_name"
+                           placeholder="e.g., Jack Daniel's" required>
                 </div>
-            </div>
 
-            <!-- Name and address: validated via token/substring matching against OCR text -->
-            <div class="form-group">
-                <label for="name_address">Name and Address of Producer/Bottler</label>
-                <textarea id="name_address" name="name_address"
-                          placeholder="e.g., Jack Daniel Distillery, Lynchburg, Tennessee" required></textarea>
-            </div>
-
-            <!-- Government warning: strict match with exact casing/punctuation.
-                 If left blank, the system uses the canonical warning constant. -->
-            <div class="form-group">
-                <label for="government_warning_expected">Government Warning Statement</label>
-                <p class="hint">Leave blank to use the standard required warning text.</p>
-                <textarea id="government_warning_expected" name="government_warning_expected"
-                          placeholder="Leave blank for default canonical warning"></textarea>
-            </div>
-
-            <hr>
-
-            <!-- Multi-file upload: each image is validated independently -->
-            <div class="form-group">
-                <label>Label Images</label>
-                <p class="hint">Upload front and/or back label images (PNG, JPG, JPEG).</p>
-                <div class="file-upload">
-                    <p>Select one or more label images</p>
-                    <input type="file" name="images" accept=".png,.jpg,.jpeg" multiple required>
+                <div class="form-group">
+                    <label for="class_type_designation">Class/Type Designation</label>
+                    <input type="text" id="class_type_designation" name="class_type_designation"
+                           placeholder="e.g., Tennessee Sour Mash Whiskey" required>
                 </div>
-            </div>
 
-            <button type="submit" class="btn-primary" id="submit-btn">Verify Labels</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="alcohol_content">Alcohol Content</label>
+                        <p class="hint">Percentage as shown on label</p>
+                        <input type="text" id="alcohol_content" name="alcohol_content"
+                               placeholder="e.g., 40%" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="net_contents">Net Contents</label>
+                        <p class="hint">Volume as shown on label</p>
+                        <input type="text" id="net_contents" name="net_contents"
+                               placeholder="e.g., 750 mL" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name_address">Name and Address of Producer/Bottler</label>
+                    <textarea id="name_address" name="name_address"
+                              placeholder="e.g., Jack Daniel Distillery, Lynchburg, Tenn. USA" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="government_warning_expected">Government Warning Statement <span class="label-optional">(optional)</span></label>
+                    <p class="hint">Leave blank to use the standard required warning text.</p>
+                    <textarea id="government_warning_expected" name="government_warning_expected"
+                              placeholder="Leave blank for default canonical warning"></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend class="form-section__legend">Label Images</legend>
+                <p class="hint" style="margin-bottom:0.75rem;">Upload front and/or back label images. Multiple images will be combined for validation.</p>
+                <div class="file-upload" id="drop-zone">
+                    <div class="file-upload__icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="file-upload__text">Drag and drop images here, or click to browse</p>
+                    <p class="file-upload__formats">PNG, JPG, JPEG</p>
+                    <input type="file" name="images" id="file-input" accept=".png,.jpg,.jpeg" multiple required>
+                </div>
+                <div id="file-preview" class="file-preview"></div>
+            </fieldset>
+
+            <button type="submit" class="btn-primary" id="submit-btn">
+                Verify Labels
+            </button>
         </form>
 
-        <!-- Loading overlay — shown while OCR + validation runs -->
+        <!-- Loading overlay -->
         <div id="loading-overlay" class="loading-overlay" style="display:none;">
             <div class="loading-content">
                 <div class="spinner"></div>
@@ -95,12 +109,71 @@
                 <p class="loading-hint">Running OCR and validating fields</p>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>AI-Powered Label Verification Prototype</p>
+    </footer>
 
     <script>
-        document.querySelector('form').addEventListener('submit', function() {
+        // Loading state on submit
+        document.getElementById('verify-form').addEventListener('submit', function() {
             document.getElementById('submit-btn').disabled = true;
+            document.getElementById('submit-btn').textContent = 'Processing...';
             document.getElementById('loading-overlay').style.display = 'flex';
+        });
+
+        // File preview with thumbnails
+        var fileInput = document.getElementById('file-input');
+        var preview = document.getElementById('file-preview');
+        var dropZone = document.getElementById('drop-zone');
+
+        fileInput.addEventListener('change', showPreviews);
+
+        function showPreviews() {
+            preview.innerHTML = '';
+            if (!fileInput.files.length) return;
+            for (var i = 0; i < fileInput.files.length; i++) {
+                var file = fileInput.files[i];
+                var item = document.createElement('div');
+                item.className = 'file-preview__item';
+
+                var img = document.createElement('img');
+                img.className = 'file-preview__thumb';
+                img.src = URL.createObjectURL(file);
+
+                var name = document.createElement('span');
+                name.className = 'file-preview__name';
+                name.textContent = file.name;
+
+                var size = document.createElement('span');
+                size.className = 'file-preview__size';
+                size.textContent = (file.size / 1024).toFixed(0) + ' KB';
+
+                var info = document.createElement('div');
+                info.className = 'file-preview__info';
+                info.appendChild(name);
+                info.appendChild(size);
+
+                item.appendChild(img);
+                item.appendChild(info);
+                preview.appendChild(item);
+            }
+        }
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropZone.classList.add('file-upload--dragover');
+        });
+        dropZone.addEventListener('dragleave', function() {
+            dropZone.classList.remove('file-upload--dragover');
+        });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.classList.remove('file-upload--dragover');
+            fileInput.files = e.dataTransfer.files;
+            showPreviews();
         });
     </script>
 </body>
