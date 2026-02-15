@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Results</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Verification Results</h1>
+        <p class="subtitle">Beverage type: <strong>{{ beverage_type }}</strong></p>
+
+        {% if errors %}
+        <ul class="error-list">
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- Overall status -->
+        <div class="result-card {{ 'compliant' if status == 'COMPLIANT' else 'non-compliant' }}">
+            <div class="result-header">
+                <span class="image-name">Overall Result</span>
+                <span class="status-badge {{ 'compliant' if status == 'COMPLIANT' else 'non-compliant' }}">
+                    {{ status }}
+                </span>
+            </div>
+            {% if per_image_ocr|length > 1 %}
+            <p class="aggregate-note">Combined OCR text from {{ per_image_ocr|length }} images for validation.</p>
+            {% endif %}
+        </div>
+
+        <!-- Field-by-field breakdown -->
+        <h2 class="section-heading">Field Verification</h2>
+        <div class="fv-grid">
+            {% for f in field_results %}
+            <div class="fv-card fv-card--{{ f.status }}">
+                <div class="fv-card__top">
+                    <span class="fv-card__label">{{ f.label }}</span>
+                    {% if f.status == "matched" %}
+                    <span class="fv-card__badge fv-card__badge--matched">Matched</span>
+                    {% elif f.status == "info" %}
+                    <span class="fv-card__badge fv-card__badge--info">Not Matched</span>
+                    {% else %}
+                    <span class="fv-card__badge fv-card__badge--error">Not Matched</span>
+                    {% endif %}
+                </div>
+                <div class="fv-card__row">
+                    <div class="fv-card__col">
+                        <span class="fv-card__col-label">Submitted</span>
+                        <span class="fv-card__col-value">{{ f.value }}</span>
+                    </div>
+                    <div class="fv-card__col">
+                        <span class="fv-card__col-label">OCR Found</span>
+                        <span class="fv-card__col-value fv-card__col-value--ocr">{{ f.ocr_found if f.ocr_found else '—' }}</span>
+                    </div>
+                </div>
+                <div class="fv-card__msg fv-card__msg--{{ f.status }}">{{ f.message }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Combined OCR text used for validation -->
+        {% if combined_ocr %}
+        <h2 class="section-heading">Combined OCR Text (Used for Validation)</h2>
+        <details>
+            <summary>Show full OCR text{% if per_image_ocr|length > 1 %} (aggregated from {{ per_image_ocr|length }} images){% endif %}</summary>
+            <div class="ocr-excerpt">{{ combined_ocr }}</div>
+        </details>
+        {% endif %}
+
+        <!-- Per-image OCR excerpts -->
+        {% if per_image_ocr and per_image_ocr|length > 1 %}
+        <h2 class="section-heading">OCR Output Per Image</h2>
+        {% for img in per_image_ocr %}
+        <div class="result-card">
+            <div class="result-header">
+                <span class="image-name">{{ img.image_name }}</span>
+            </div>
+            <details>
+                <summary>OCR Extracted Text</summary>
+                <div class="ocr-excerpt">{{ img.ocr_text_excerpt }}</div>
+            </details>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if not per_image_ocr and not errors %}
+        <p>No images were processed. Please go back and upload valid label images.</p>
+        {% endif %}
+
+        <a href="/" class="back-link">Verify another label</a>
+    </div>
+</body>
+</html>

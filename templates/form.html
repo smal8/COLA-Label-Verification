@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Verification</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Alcohol Label Verification</h1>
+        <p class="subtitle">Upload label images and enter the declared label information to verify compliance.</p>
+
+        <form action="/submit" method="post" enctype="multipart/form-data">
+            <!-- Beverage type determines which validation rules apply -->
+            <div class="form-group">
+                <label for="beverage_type">Beverage Type</label>
+                <select id="beverage_type" name="beverage_type" required>
+                    <option value="" disabled selected>Select beverage type</option>
+                    <option value="malt">Beer / Malt Beverage</option>
+                    <option value="spirits">Distilled Spirits</option>
+                    <option value="wine">Wine</option>
+                </select>
+            </div>
+
+            <hr>
+
+            <!-- Brand name: validated via case-insensitive contains check against OCR text -->
+            <div class="form-group">
+                <label for="brand_name">Brand Name</label>
+                <input type="text" id="brand_name" name="brand_name" placeholder="e.g., Jack Daniel's" required>
+            </div>
+
+            <!-- Class/type designation: e.g., "Tennessee Whiskey", "Cabernet Sauvignon" -->
+            <div class="form-group">
+                <label for="class_type_designation">Class/Type Designation</label>
+                <input type="text" id="class_type_designation" name="class_type_designation"
+                       placeholder="e.g., Tennessee Whiskey" required>
+            </div>
+
+            <div class="form-row">
+                <!-- Alcohol content: validated via regex extraction + exact numeric match -->
+                <div class="form-group">
+                    <label for="alcohol_content">Alcohol Content</label>
+                    <p class="hint">As shown on label.</p>
+                    <input type="text" id="alcohol_content" name="alcohol_content"
+                           placeholder="e.g., 40%" required>
+                </div>
+
+                <!-- Net contents: validated via regex presence check on OCR text -->
+                <div class="form-group">
+                    <label for="net_contents">Net Contents</label>
+                    <p class="hint">Volume as shown on label.</p>
+                    <input type="text" id="net_contents" name="net_contents"
+                           placeholder="e.g., 750 mL" required>
+                </div>
+            </div>
+
+            <!-- Name and address: validated via token/substring matching against OCR text -->
+            <div class="form-group">
+                <label for="name_address">Name and Address of Producer/Bottler</label>
+                <textarea id="name_address" name="name_address"
+                          placeholder="e.g., Jack Daniel Distillery, Lynchburg, Tennessee" required></textarea>
+            </div>
+
+            <!-- Government warning: strict match with exact casing/punctuation.
+                 If left blank, the system uses the canonical warning constant. -->
+            <div class="form-group">
+                <label for="government_warning_expected">Government Warning Statement</label>
+                <p class="hint">Leave blank to use the standard required warning text.</p>
+                <textarea id="government_warning_expected" name="government_warning_expected"
+                          placeholder="Leave blank for default canonical warning"></textarea>
+            </div>
+
+            <hr>
+
+            <!-- Multi-file upload: each image is validated independently -->
+            <div class="form-group">
+                <label>Label Images</label>
+                <p class="hint">Upload front and/or back label images (PNG, JPG, JPEG).</p>
+                <div class="file-upload">
+                    <p>Select one or more label images</p>
+                    <input type="file" name="images" accept=".png,.jpg,.jpeg" multiple required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submit-btn">Verify Labels</button>
+        </form>
+
+        <!-- Loading overlay — shown while OCR + validation runs -->
+        <div id="loading-overlay" class="loading-overlay" style="display:none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p class="loading-text">Analyzing label images...</p>
+                <p class="loading-hint">Running OCR and validating fields</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('loading-overlay').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
