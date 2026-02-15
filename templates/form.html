@@ -20,6 +20,31 @@
             <p>Enter the declared label information and upload label images to check compliance against TTB requirements.</p>
         </div>
 
+        <fieldset class="form-section examples-section">
+            <legend class="form-section__legend">Try an Example</legend>
+            <p class="hint" style="margin-bottom:0.75rem;">Don't have a label handy? Click an example below to pre-fill the form, then download the sample images to upload.</p>
+            <div class="examples-grid">
+                <button type="button" class="example-card" onclick="loadExample('spirits')">
+                    <img src="/samples/jack-daniels-front.jpeg" alt="Jack Daniel's" class="example-card__img">
+                    <div class="example-card__info">
+                        <span class="example-card__name">Jack Daniel's</span>
+                        <span class="example-card__type">Distilled Spirits</span>
+                    </div>
+                </button>
+                <button type="button" class="example-card" onclick="loadExample('malt')">
+                    <img src="/samples/bluff-city-blonde-beer.png" alt="Bluff City Blonde" class="example-card__img">
+                    <div class="example-card__info">
+                        <span class="example-card__name">Bluff City Blonde</span>
+                        <span class="example-card__type">Beer / Malt Beverage</span>
+                    </div>
+                </button>
+            </div>
+            <div id="example-images-hint" class="example-download" style="display:none;">
+                <p class="example-download__text">Form pre-filled. Now download and upload these sample images:</p>
+                <div id="example-image-links" class="example-download__links"></div>
+            </div>
+        </fieldset>
+
         <form action="/submit" method="post" enctype="multipart/form-data" id="verify-form">
             <fieldset class="form-section">
                 <legend class="form-section__legend">Beverage Type</legend>
@@ -175,6 +200,66 @@
             fileInput.files = e.dataTransfer.files;
             showPreviews();
         });
+
+        // Example data
+        var examples = {
+            spirits: {
+                beverage_type: 'spirits',
+                brand_name: "Jack Daniel's",
+                class_type_designation: 'Tennessee Sour Mash Whiskey',
+                alcohol_content: '40%',
+                net_contents: '750 mL',
+                name_address: "Jack Daniel Distillery, Lynchburg, Tennessee, USA",
+                images: [
+                    { name: 'jack-daniels-front.jpeg', url: '/samples/jack-daniels-front.jpeg' },
+                    { name: 'jack-daniels-back.png', url: '/samples/jack-daniels-back.png' },
+                    { name: 'jack-daniels-full-label.jpg', url: '/samples/jack-daniels-full-label.jpg' }
+                ]
+            },
+            malt: {
+                beverage_type: 'malt',
+                brand_name: 'Bluff City Blonde',
+                class_type_designation: 'Blonde Ale',
+                alcohol_content: '5%',
+                net_contents: '12 FL OZ',
+                name_address: "Memphis Made Brewing Co., Memphis, TN",
+                images: [
+                    { name: 'bluff-city-blonde-beer.png', url: '/samples/bluff-city-blonde-beer.png' }
+                ]
+            }
+        };
+
+        function loadExample(type) {
+            var ex = examples[type];
+            document.getElementById('beverage_type').value = ex.beverage_type;
+            document.getElementById('brand_name').value = ex.brand_name;
+            document.getElementById('class_type_designation').value = ex.class_type_designation;
+            document.getElementById('alcohol_content').value = ex.alcohol_content;
+            document.getElementById('net_contents').value = ex.net_contents;
+            document.getElementById('name_address').value = ex.name_address;
+            document.getElementById('government_warning_expected').value = '';
+
+            // Show download links for sample images
+            var hint = document.getElementById('example-images-hint');
+            var links = document.getElementById('example-image-links');
+            links.innerHTML = '';
+            ex.images.forEach(function(img) {
+                var a = document.createElement('a');
+                a.href = img.url;
+                a.download = img.name;
+                a.className = 'example-download__link';
+                a.textContent = img.name;
+                links.appendChild(a);
+            });
+            hint.style.display = 'block';
+
+            // Highlight the active card
+            document.querySelectorAll('.example-card').forEach(function(c) { c.classList.remove('example-card--active'); });
+            event.currentTarget.classList.add('example-card--active');
+
+            // Scroll to the form
+            document.getElementById('verify-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     </script>
 </body>
 </html>

@@ -253,6 +253,104 @@ textarea {
     color: #9ca3af;
 }
 
+/* ── Example Cards ── */
+
+.examples-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.example-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.example-card:hover {
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.08);
+}
+
+.example-card--active {
+    border-color: #4a6cf7;
+    background: #f0f4ff;
+}
+
+.example-card__img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.example-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.example-card__name {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+}
+
+.example-card__type {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.example-download {
+    margin-top: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+}
+
+.example-download__text {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #1e40af;
+    margin-bottom: 0.4rem;
+}
+
+.example-download__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.example-download__link {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #4a6cf7;
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    background: #fff;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.example-download__link:hover {
+    background: #dbeafe;
+}
+
 /* ── Submit Button ── */
 
 .btn-primary {
@@ -587,4 +685,5 @@ textarea {
     fieldset.form-section { padding: 1rem; }
     .fv-card__row { grid-template-columns: 1fr; }
     .result-hero { flex-direction: column; text-align: center; }
+    .examples-grid { grid-template-columns: 1fr; }
 }
