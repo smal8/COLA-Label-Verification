@@ -2,7 +2,7 @@
 
 A standalone prototype that validates alcohol beverage label images against structured application form data using OCR. Designed to assist TTB compliance analysts by automating the routine "matching" checks they perform on ~150,000 label applications per year.
 
-**Live Demo:** http://44.230.59.49.nip.io:8000
+**Live Demo:** http://3.233.32.226.nip.io:8000
 
 ## What It Does
 

@@ -107,12 +107,16 @@ def net_contents_present(ctx) -> dict | None:
 
     # Normalize submitted value for comparison
     submitted_norm = normalize_loose(ctx.form.net_contents)
+    # Also create a spaceless version for OCR like "12FL.OZ." -> "12floz"
+    submitted_compact = submitted_norm.replace(" ", "")
 
     # Check each candidate for a match
     for candidate in candidates:
         candidate_norm = normalize_loose(candidate)
-        # Check if the numeric + unit parts match
-        if submitted_norm in candidate_norm or candidate_norm in submitted_norm:
+        candidate_compact = candidate_norm.replace(" ", "")
+        # Check with and without spaces to handle "12 fl oz" vs "12floz"
+        if (submitted_norm in candidate_norm or candidate_norm in submitted_norm
+                or submitted_compact == candidate_compact):
             ctx._ocr_found_net_contents = candidate
             return None
 
